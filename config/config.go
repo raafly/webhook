@@ -11,8 +11,9 @@ type AppConfig struct {
 		Host     string
 		Port     string
 		Username string
+		Name   	 string
 		Password string
-		Dbname   string
+		SSL 	 string
 	}
 }
 

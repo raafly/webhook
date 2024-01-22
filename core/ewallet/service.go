@@ -1,7 +1,7 @@
 package ewallet
 
 type ewalletService interface {
-	GetPaymentStatus(transactionID string) (*ewalletStatusResponse, error)
+	GetPaymentStatus(transactionID string) (*responePaymentStatus, error)
 	InsertOne(ewallet *ewallet) error
 	UpdateOne(ewallet *ewallet) error
 	ChangeStatus(transactionID string, status string) error
@@ -15,16 +15,27 @@ func NewEwalletService(ewalletRepository ewalletRepository) ewalletService {
 	return &ewalletServiceImpl{ewalletRepository}
 }
 
-func (s *ewalletServiceImpl) GetPaymentStatus(transactionID string) (*ewalletStatusResponse, error) {
-	return s.ewalletRepository.FindOneByTransactionID(transactionID)
+func (s *ewalletServiceImpl) GetPaymentStatus(transactionID string) (*responePaymentStatus, error) {
+	res, err := s.ewalletRepository.FindOneByTransactionID(transactionID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &responePaymentStatus{
+		ID: res.ID,
+		Status: res.Status,
+		CustomerID: res.CustomerID,
+		Created: res.Created,
+		Updated: res.Update,
+	}, nil
 }
 
 func (s *ewalletServiceImpl) InsertOne(ewallet *ewallet) error {
-	return s.ewalletRepository.InsertOne(&ewalletStatusResponse{})
+	return s.ewalletRepository.InsertOne(&requestEwallet{})
 }
 
 func (s *ewalletServiceImpl) UpdateOne(ewallet *ewallet) error {
-	return s.ewalletRepository.UpdateOne(&ewalletStatusResponse{})
+	return s.ewalletRepository.UpdateOne(&requestEwallet{})
 }
 
 func (s *ewalletServiceImpl) ChangeStatus(transactionID string, status string) error {

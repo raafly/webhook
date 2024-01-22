@@ -1,16 +1,14 @@
 package ewallet
 
+import (
+	"time"
+)
+
 type ewallet struct {
-	TransactionID string
-	OrderID       string
-	ExternalID    string
-	Status        string
-	Amount        string
-	Actions       []struct {
-		Name   string
-		Method string
-		URL    string
-	}
-	CreatedAt string
-	UpdatedAt string
+	ID 			string
+	Status      string
+	CustomerID  string
+	ReferenceID string
+	Created		time.Time
+	Update		time.Time
 }

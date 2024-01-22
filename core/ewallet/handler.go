@@ -1,9 +1,12 @@
 package ewallet
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	constants "github.com/raafly/webhook/constans"
+)
 
 type EwalletHandler interface {
-	EWalletPaymentStatus(c *fiber.Ctx) error
+	FindTransactionById(c *fiber.Ctx) error
 }
 
 type ewalletHandlerImpl struct {
@@ -14,16 +17,16 @@ func NewEwalletHandler(ewalletService ewalletService) EwalletHandler {
 	return &ewalletHandlerImpl{ewalletService}
 }
 
-func (h *ewalletHandlerImpl) EWalletPaymentStatus(c *fiber.Ctx) error {
-	data := new(ewalletStatusResponse)
-	if err := c.BodyParser(data); err != nil {
-		return err
+func (h *ewalletHandlerImpl) FindTransactionById(c *fiber.Ctx) error {
+	param := c.Params("id")
+	result, err := h.ewalletService.GetPaymentStatus(param)
+	if err !=  nil {
+		return c.Status(404).JSON(
+			constants.NewNotFoundError("id transaction not found"),
+		)
 	}
 
-	ewallet, err := h.ewalletService.GetPaymentStatus(data.TransactionID)
-	if err != nil {
-		return err
-	}
-
-	return c.Status(200).JSON(ewallet)
+	return c.Status(200).JSON(
+		constants.NewSuccess("success get payment", result),
+	)
 }

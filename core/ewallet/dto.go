@@ -1,16 +1,18 @@
 package ewallet
 
-type ewalletStatusResponse struct {
-	TransactionID string `json:"transaction_id"`
-	OrderID       string `json:"order_id"`
-	ExternalID    string `json:"external_id"`
-	Status        string `json:"status"`
-	Amount        string `json:"amount"`
-	Actions       []struct {
-		Name   string `json:"name"`
-		Method string `json:"method"`
-		URL    string `json:"url"`
-	} `json:"actions"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+import "time"
+
+type responePaymentStatus struct {
+	ID          string    `json:"id"`
+	Status      string    `json:"status"`
+	CustomerID  string    `json:"customer_id"`
+	ReferenceID string    `json:"reference_id"`
+	Created     time.Time `json:"created"`
+	Updated     time.Time `json:"updated"`
+}
+
+type requestEwallet struct {
+	ID			string	`json:"id"`
+	Status		string	`json:"status"`
+	CustomerID	string	`json:"customer_id"`
 }
