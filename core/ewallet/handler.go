@@ -7,19 +7,20 @@ import (
 
 type EwalletHandler interface {
 	FindTransactionById(c *fiber.Ctx) error
+	ChangeStatus(c *fiber.Ctx) error
 }
 
 type ewalletHandlerImpl struct {
-	ewalletService ewalletService
+	port ewalletService
 }
 
-func NewEwalletHandler(ewalletService ewalletService) EwalletHandler {
-	return &ewalletHandlerImpl{ewalletService}
-}
+func NewEwalletHandler(port ewalletService) EwalletHandler {
+	return &ewalletHandlerImpl{port: port}
+} 
 
 func (h *ewalletHandlerImpl) FindTransactionById(c *fiber.Ctx) error {
 	param := c.Params("id")
-	result, err := h.ewalletService.GetPaymentStatus(param)
+	result, err := h.port.GetPaymentStatus(param)
 	if err !=  nil {
 		return c.Status(404).JSON(
 			constants.NewNotFoundError("id transaction not found"),
@@ -29,4 +30,19 @@ func (h *ewalletHandlerImpl) FindTransactionById(c *fiber.Ctx) error {
 	return c.Status(200).JSON(
 		constants.NewSuccess("success get payment", result),
 	)
+}
+
+func (h *ewalletHandlerImpl) ChangeStatus(c *fiber.Ctx) error {
+	param := c.Params("id")
+	payload := new(payload)
+	c.BodyParser(payload)
+
+	err := h.port.ChangeStatus(param, payload.Status.Status)
+	if err != nil {
+		return c.Status(400).JSON(
+			constants.NewBadRequestError(err.Error()),
+		)
+	}
+
+	return c.Status(200).JSON(fiber.Map{"massage": "success"})
 }

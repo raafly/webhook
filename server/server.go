@@ -25,7 +25,7 @@ func NewServer() *Server {
 func (s *Server) Run() error {
 	db := database.NewPostgres(s.Conf)
 
-	handler.NewEwalletRoutes(s.App, db)
+	handler.NewAuthRoutes(s.App, db)
 
 	return s.App.Listen(":3000")
 }

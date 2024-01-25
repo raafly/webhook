@@ -16,3 +16,12 @@ type requestEwallet struct {
 	Status		string	`json:"status"`
 	CustomerID	string	`json:"customer_id"`
 }
+
+type payload struct {
+	Status 	status	`json:"data"`
+}
+
+type status struct {
+	Status	string	`json:"status"`
+	ID		string	`json:"id"`
+}
