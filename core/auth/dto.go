@@ -1,16 +1,17 @@
 package auth
 
 type register struct {
-	Username	string	`json:"username"`
-	Email 		string	`json:"email"`
-	Phone 		string	`json:"phone"`
-	Password 	string	`json:"password"`
+	ID 			string	`json:"id"`
+	Username	string	`json:"username" validate:"required, min=5"`
+	Email 		string	`json:"email" validate:"required, email"`
+	Phone 		string	`json:"phone" validate:"required, min=12, max=12"`
+	Password 	string	`json:"password" validate:"required, min=8"`
 }
 
 type login struct {
-	Username	string	`json:"username"`
-	Email 		string	`json:"email"`
-	Password 	string	`json:"password"`	
+	Username	string	`json:"username" validate:"required, min=5"`
+	Email 		string	`json:"email" validate:"required, email"`
+	Password 	string	`json:"password" validate:"required, min=8"`	
 }
 
 type loginResponse struct {

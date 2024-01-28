@@ -1,12 +1,13 @@
 package auth
 
-import "gorm.io/gorm"
+import "time"
 
 type User struct {
-	gorm.Model
-	ID 			string	`gorm:"primaryKey"`
-	Username	string
-	Email		string
-	Phone 		string
-	Password 	string
+	ID       string `gorm:"primaryKey"`
+	Username string
+	Email    string
+	Phone    string
+	Password string
+	Created  time.Time `gorm:"column:created_at;autoCreateTime"`
+	Updated  time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
 }

@@ -1,9 +1,11 @@
 package auth
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type authRepository interface {
-	insertOne(data *register) error
+	insertOne(user *register) error
 	findById(ID string) (*User, error)
 }
 
@@ -15,8 +17,16 @@ func NewAuthRepository(db *gorm.DB) authRepository {
 	return &authRepositoryImpl{db: db}
 }
 
-func (r *authRepositoryImpl) insertOne(data *register) error {
-	return r.db.Create(data).Error
+func (r *authRepositoryImpl) insertOne(user *register) error {
+	data := &User{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		Password: user.Password,
+		Phone: 	  user.Phone,
+	}
+
+	return r.db.Table("users").Create(data).Error
 }
 
 func (r *authRepositoryImpl) findById(ID string) (*User, error) {

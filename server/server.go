@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/raafly/webhook/config"
+	// "github.com/raafly/webhook/core/auth"
 	"github.com/raafly/webhook/database"
-	"github.com/raafly/webhook/handler"
 )
 
 type Server struct {
@@ -24,8 +24,9 @@ func NewServer() *Server {
 
 func (s *Server) Run() error {
 	db := database.NewPostgres(s.Conf)
+	// db.AutoMigrate(&auth.User{})
 
-	handler.NewAuthRoutes(s.App, db)
+	NewUserRoutes(s.App, db)
 
 	return s.App.Listen(":3000")
 }

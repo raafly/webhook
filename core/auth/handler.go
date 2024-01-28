@@ -24,10 +24,10 @@ func (h *handlerUserImpl) Register(c *fiber.Ctx) error {
 
 	err := h.port.insertOne(data)
 	if err != nil {
-		return constans.NewBadRequestError(err.Error())
+		return c.Status(400).JSON(constans.NewBadRequestError(err.Error()))
 	}
 
-	return constans.NewCreated("success create acccount")
+	return c.Status(201).JSON(constans.NewCreated("success create acccount"))
 }
 
 func (h *handlerUserImpl) Login(c *fiber.Ctx) error {
@@ -36,13 +36,28 @@ func (h *handlerUserImpl) Login(c *fiber.Ctx) error {
 
 	respon, err := h.port.login(data)
 	if err != nil {
-		return constans.NewBadRequestError(err.Error())
+		return c.Status(400).JSON(constans.NewBadRequestError(err.Error()))
 	}
 
-	cookie := new(fiber.Cookie)
-	cookie.Name = "access_token"
-	cookie.Value = respon.AccessToken
-	// cookie.Expires =  time.Now().Add(time.Hour * 24).Unix()
+	c.Cookie(&fiber.Cookie{
+		Name: "access_token",
+		Value: respon.AccessToken,
+		MaxAge: int(respon.AccessTokenExpired),
+		SameSite: "disable",
+		Domain: "localhost",
+	})
 
-	return constans.NewSuccess("success login", nil)
+	c.Cookie(&fiber.Cookie{
+		Name: "refresh_token",
+		Value: respon.RefreshToken,
+		MaxAge: int(respon.RefreshTokenExpired),
+		SameSite: "disable",
+		Domain: "localhost",
+	})
+
+	return c.Status(200).JSON(fiber.Map{
+		"status": "ok",
+		"message": "login success",
+		"result": respon,
+	})
 }
