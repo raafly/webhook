@@ -6,7 +6,7 @@ import (
 
 type authRepository interface {
 	insertOne(user *register) error
-	findById(ID string) (*User, error)
+	findByEmail(ID string) (*User, error)
 }
 
 type authRepositoryImpl struct {
@@ -23,15 +23,14 @@ func (r *authRepositoryImpl) insertOne(user *register) error {
 		Username: user.Username,
 		Email:    user.Email,
 		Password: user.Password,
-		Phone: 	  user.Phone,
 	}
 
 	return r.db.Table("users").Create(data).Error
 }
 
-func (r *authRepositoryImpl) findById(ID string) (*User, error) {
+func (r *authRepositoryImpl) findByEmail(ID string) (*User, error) {
 	var user User
-	err := r.db.Where("id = ?", ID).Take(&user).Error
+	err := r.db.Where("email = ?", ID).Take(&user).Error
 	if err != nil {
 		return nil, err
 	}

@@ -15,6 +15,11 @@ type AppConfig struct {
 		Password string
 		SSL 	 string
 	}
+	Email struct {
+		Sender	  string
+		Adderss   string
+		Password  string
+	}
 }
 
 var appConfig *AppConfig
@@ -26,6 +31,7 @@ func NewAppConfig() *AppConfig {
 		initApp(appConfig)
 		initFiber(appConfig)
 		initPostgres(appConfig)
+		initMail(appConfig)
 	}
 	return appConfig
 }

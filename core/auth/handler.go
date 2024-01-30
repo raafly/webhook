@@ -2,7 +2,7 @@ package auth
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/raafly/webhook/constans"
+	"github.com/raafly/webhook/utils/constans"
 )
 
 type handlerUser interface {
@@ -27,7 +27,7 @@ func (h *handlerUserImpl) Register(c *fiber.Ctx) error {
 		return c.Status(400).JSON(constans.NewBadRequestError(err.Error()))
 	}
 
-	return c.Status(201).JSON(constans.NewCreated("success create acccount"))
+	return c.Status(201).JSON(constans.NewCreated("success create account"))
 }
 
 func (h *handlerUserImpl) Login(c *fiber.Ctx) error {
@@ -36,7 +36,7 @@ func (h *handlerUserImpl) Login(c *fiber.Ctx) error {
 
 	respon, err := h.port.login(data)
 	if err != nil {
-		return c.Status(400).JSON(constans.NewBadRequestError(err.Error()))
+		return c.Status(404).JSON(constans.NewBadRequestError(err.Error()))
 	}
 
 	c.Cookie(&fiber.Cookie{
@@ -55,9 +55,15 @@ func (h *handlerUserImpl) Login(c *fiber.Ctx) error {
 		Domain: "localhost",
 	})
 
-	return c.Status(200).JSON(fiber.Map{
-		"status": "ok",
-		"message": "login success",
-		"result": respon,
+	c.Set("Authorizated", respon.AccessToken)
+
+	return c.Status(200).JSON(response{
+		Code: 200,
+		Status: "OK",
+		Message: "success login",
+		Data: payload{
+			UserID: respon.UserID,
+			Token: respon.AccessToken,
+		},
 	})
 }

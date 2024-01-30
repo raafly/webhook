@@ -2,7 +2,7 @@ package ewallet
 
 import (
 	"github.com/gofiber/fiber/v2"
-	constants "github.com/raafly/webhook/constans"
+	constants "github.com/raafly/webhook/utils/constans"
 )
 
 type EwalletHandler interface {

@@ -1,1 +1,7 @@
 .env
+.yaml
+
+core/debit
+core/ewallet
+core/mail
+
