@@ -1,10 +1,10 @@
 package constans
 
 type Response struct {
+	Status  bool		`json:"status"`
 	Code	int			`json:"code"`
-	Status  string		`json:"status"`
 	Message	string		`json:"massage"`
-	Result 	interface{}	`json:"data"`
+	Data 	interface{}	`json:"data"`
 }
 
 func (r *Response) Error() string {
@@ -14,48 +14,56 @@ func (r *Response) Error() string {
 func NewSuccess(massage string, data any) error {
 	return &Response{
 		Message: massage,
-		Status: "OK",
+		Status: true,
 		Code: 200,
-		Result: data,
+		Data: data,
 	}
 }
 
 func NewCreated(massage string) error {
 	return &Response{
 		Code: 201,
-		Status: "Created",
+		Status: true,
 		Message: massage,
 	}
 }
 
-func NewNotFoundError(massage string) error {
+func NewForbiddenError(message string) error {
+	return &Response{
+		Status: false,
+		Code: 403,
+		Message: message,
+	}
+}
+
+func NewNotFoundError(message string) error {
 	return &Response{
 		Code: 404,
-		Status: "NOT FOUND",
-		Message: massage,
+		Status: false,
+		Message: message,
 	}
 }
 
-func NewBadRequestError(massage string) error {
+func NewBadRequestError(message string) error {
 	return &Response{
 		Code: 400,
-		Status: "BAD REQUEST",
-		Message: massage,
+		Status: false,
+		Message: message,
 	}
 }
 
-func NewUnauthorizedError(massage string) error {
+func NewUnauthorizedError(message string) error {
 	return &Response{
 		Code: 401,
-		Status: "UNAUTHORIZED",
-		Message: massage,
+		Status: false,
+		Message: message,
 	}
 }
 
-func NewInternalServerError(massage string) error {
+func NewInternalServerError(message string) error {
 	return &Response{
 		Code: 500,
-		Status: "INTERNAL SERVER ERROR",
-		Message: massage,
+		Status: false,
+		Message: message,
 	}
 }

@@ -28,10 +28,7 @@ func NewAppConfig() *AppConfig {
 	if appConfig == nil {
 		appConfig = &AppConfig{}
 
-		initApp(appConfig)
-		initFiber(appConfig)
-		initPostgres(appConfig)
-		initMail(appConfig)
+		initConfig(appConfig)
 	}
 	return appConfig
 }
