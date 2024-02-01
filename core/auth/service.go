@@ -12,8 +12,8 @@ import (
 )
 
 type authService interface {
-	insertOne(user *register) error
-	login(user *login) (*loginResponse, error)
+	insertOne(user *register) (string, error)
+	login(user *login) (string, error)
 	confirmPassword(ctx context.Context, email string) error
 }
 
@@ -31,10 +31,10 @@ func NewAuthService(port authRepository, pass utils.Password, validate constans.
 	}
 }
 
-func (s *authServiceImpl) insertOne(user *register) error {
+func (s *authServiceImpl) insertOne(user *register) (string, error) {
 	err := s.validate.Validate(user)
 	if err != nil {
-		return s.validate.ValidationMessage(err)
+		return "", s.validate.ValidationMessage(err)
 	}
 
 	// ctx, cancel := context.WithTimeout(context.Background(), 30 *time.Second)
@@ -47,24 +47,24 @@ func (s *authServiceImpl) insertOne(user *register) error {
 	uuid := uuid.NewString()
 
 	user.Password = hashPassword
-	user.ID = uuid
+	user.UUID = uuid
 
-	if err := s.port.insertOne(user); err != nil {
-		return constans.NewBadRequestError("account already exists")
+	if id, err := s.port.insertOne(user); err != nil {
+		return "", constans.NewBadRequestError("account already exists")
+	} else {
+		return id, nil
 	}
-
-	return nil
 }
 
-func (s *authServiceImpl) login(user *login) (*loginResponse, error) {
+func (s *authServiceImpl) login(user *login) (string, error) {
 	err := s.validate.Validate(user)
 	if err != nil {
-		return nil, s.validate.ValidationMessage(err)
+		return "", s.validate.ValidationMessage(err)
 	}
 
 	result, err := s.port.findByEmail(user.Email)
 	if err != nil {
-		return nil, constans.NewNotFoundError("ID user not found")
+		return "", constans.NewNotFoundError("ID user not found")
 	}
 	
 	err = s.pass.ComparePassword(result.Password, user.Password)
@@ -72,16 +72,7 @@ func (s *authServiceImpl) login(user *login) (*loginResponse, error) {
 		return nil, constans.NewBadRequestError("password not match")
 	}
 
-	token, tokenExp, _ := utils.NewGenerateToken().GenerateAccessToken(result.ID, result.Email, result.Username)
-	refresh, refresExp, _ := utils.NewGenerateToken().GenerateRefreshToken(result.ID, result.Email, result.Username)
-
-	return &loginResponse{
-		UserID: result.ID,
-		AccessToken: token,	
-		AccessTokenExpired: tokenExp,
-		RefreshToken: refresh,
-		RefreshTokenExpired: refresExp,
-	}, nil
+	return 
 }
 
 func (s *authServiceImpl) confirmPassword(ctx context.Context, email string) error {
