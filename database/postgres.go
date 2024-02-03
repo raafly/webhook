@@ -3,7 +3,7 @@ package database
 import (
 	"log"
 	"fmt"
-	"github.com/raafly/webhook/config"
+	"github.com/raaafly/powerup-client-service-golang/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

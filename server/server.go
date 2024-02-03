@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -10,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/raafly/webhook/config"
+	"github.com/raafly/webhook/auth"
 	"github.com/raafly/webhook/database"
 )
 
@@ -28,8 +30,19 @@ func NewServer() *Server {
 	}
 }
 
+func (s *Server) autoMigrate() error {
+	db := database.NewPostgres(s.Conf)
+	if db.Migrator().HasTable(&auth.User{}) {
+		return fmt.Errorf("table already exists ...skipping migrations")
+	}
+
+	db.AutoMigrate(&auth.User{})
+	return nil
+}
+
 func (s *Server) Run() error {
 	db := database.NewPostgres(s.Conf)
+	_ = s.autoMigrate()
 	
 	file, err := os.OpenFile(".log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {

@@ -11,7 +11,7 @@ type ErrorResponse struct {
 	Status  bool		`json:"status"`
 	Code	int			`json:"code"`
 	Message	string		`json:"massage"`
-	Data 	interface{}	`json:"errors"`
+	Err 	interface{}	`json:"errors"`
 }
 
 func (r *ErrorResponse) Error() string {
@@ -85,6 +85,6 @@ func NewCustomError(code int, message string, data any) error {
 		Status: false,
 		Code: code,
 		Message: message,
-		Data: data,
+		Err: data,
 	}
 }

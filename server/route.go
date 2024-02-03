@@ -2,10 +2,9 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/raafly/webhook/core/auth"
-	"github.com/raafly/webhook/middleware"
-	"github.com/raafly/webhook/utils"
-	"github.com/raafly/webhook/utils/constans"
+	"github.com/raaafly/powerup-client-service-golang/auth"
+	"github.com/raaafly/powerup-client-service-golang/utils"
+	"github.com/raaafly/powerup-client-service-golang/utils/constans"
 	"gorm.io/gorm"
 )
 
@@ -14,11 +13,9 @@ func NewUserRoutes(app *fiber.App, db *gorm.DB) {
 	service := auth.NewAuthService(repo, *utils.NewPassword(), constans.NewValidationError())
 	handler := auth.NewUserHandler(service)
 
-	public := app.Group("/public")
-	public.Use(middleware.ErrorMiddleware)
+	public := app.Group("/auth")
 	public.Post("/register", handler.Register)
 	public.Post("/login", handler.Login)
-	public.Get("/panic", func(c *fiber.Ctx) error {
-		panic("someathing when wrong")
-	})
+	public.Post("/forget-password", handler.ForgetPassword)
+	public.Get("/reset-password/", handler.ResetPassword)
 }

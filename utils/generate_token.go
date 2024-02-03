@@ -1,11 +1,12 @@
 package utils
 
 import (
+	"math/rand"
 	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/raafly/webhook/utils/constans"
+	"github.com/raaafly/powerup-client-service-golang/utils/constans"
 )
 
 type GenerateToken struct{}
@@ -51,4 +52,14 @@ func (g *GenerateToken) GenerateRefreshToken(id, email, username string) (string
 	}
 
 	return tokenString, expired, nil
+}
+
+func GenerateRandomCode(length int) string {
+	rand.NewSource(time.Now().UnixNano())
+	charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	code := make([]byte, length)
+	for i := range code {
+		code[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(code)
 }

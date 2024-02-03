@@ -23,7 +23,7 @@ func initConfig(conf *AppConfig) {
 
 	conf.Email.Sender = v.GetString("EMAIL_SENDER_NAME")
 	conf.Email.Adderss = v.GetString("EMAIL_SENDER_ADDRESS")
-	conf.Email.Password = v.GetString("uhuvraenjuwewvkw")
+	conf.Email.Password = v.GetString("EMAIL_SENDER_PASSWORD")
 
 	conf.Postgres.Host = v.GetString("DB_HOST")
 	conf.Postgres.Port = v.GetString("DB_PORT")

@@ -1,7 +1,7 @@
 package main
 
-import "github.com/raafly/webhook/server"
+import "github.com/raaafly/powerup-client-service-golang"
 
 func main() {
-	server.NewServer().Run()
+	_ = server.NewServer().Run()
 }

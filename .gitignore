@@ -1,5 +1,6 @@
 .env
 .yaml
+.log
 
 core/debit
 core/ewallet

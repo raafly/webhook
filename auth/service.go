@@ -1,20 +1,21 @@
 package auth
 
 import (
-	"context"
-	// "time"
+	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/raafly/webhook/config"
-	"github.com/raafly/webhook/core/mail"
-	"github.com/raafly/webhook/utils"
-	"github.com/raafly/webhook/utils/constans"
+	"github.com/raaafly/powerup-client-service-golang/config"
+	"github.com/raaafly/powerup-client-service-golang/mail"
+	"github.com/raaafly/powerup-client-service-golang/utils"
+	"github.com/raaafly/powerup-client-service-golang/utils/constans"
 )
 
 type authService interface {
 	insertOne(user *register) (string, error)
 	login(user *login) (string, error)
-	confirmPassword(ctx context.Context, email string) error
+	// confirmPassword(ctx context.Context, email string) error
+	forgetPassword(email string) error
+	resetPassword(req *resetPassword) error 
 }
 
 type authServiceImpl struct {
@@ -37,23 +38,26 @@ func (s *authServiceImpl) insertOne(user *register) (string, error) {
 		return "", s.validate.ValidationMessage(err)
 	}
 
-	// ctx, cancel := context.WithTimeout(context.Background(), 30 *time.Second)
-	// defer cancel()
-	// if err = s.confirmPassword(ctx, user.Email); err != nil {
-	// 	return constans.NewBadRequestError("timeout for confirm password")
-	// }
-
-	hashPassword := s.pass.HashPassword(user.Password)
-	uuid := uuid.NewString()
-
-	user.Password = hashPassword
-	user.UUID = uuid
-
-	if id, err := s.port.insertOne(user); err != nil {
-		return "", constans.NewBadRequestError("account already exists")
-	} else {
-		return id, nil
+	/*
+	ctx, cancel := context.WithTimeout(context.Background(), 30 *time.Second)
+	defer cancel()
+	if err = s.confirmPassword(ctx, user.Email); err != nil {
+		return constans.NewBadRequestError("timeout for confirm password")
 	}
+	*/
+
+	user.Password = s.pass.HashPassword(user.Password)
+	user.UUID = uuid.NewString()
+
+	err = s.port.insertOne(user)
+	if err != nil {
+		return "", constans.NewBadRequestError("account already exists")
+	}  
+
+	token := uuid.New().String()
+	fmt.Println(token)
+
+	return token, nil
 }
 
 func (s *authServiceImpl) login(user *login) (string, error) {
@@ -64,17 +68,20 @@ func (s *authServiceImpl) login(user *login) (string, error) {
 
 	result, err := s.port.findByEmail(user.Email)
 	if err != nil {
-		return "", constans.NewNotFoundError("ID user not found")
+		return  "", constans.NewNotFoundError("ID user not found")
 	}
 	
 	err = s.pass.ComparePassword(result.Password, user.Password)
 	if err != nil {
-		return nil, constans.NewBadRequestError("password not match")
+		return "", constans.NewBadRequestError("password not match")
 	}
 
-	return 
+	token := uuid.New().String()
+
+	return token, nil
 }
 
+/*
 func (s *authServiceImpl) confirmPassword(ctx context.Context, email string) error {
 	sender := mail.NewGmailSender(
 		config.NewAppConfig().Email.Sender, 
@@ -96,4 +103,25 @@ func (s *authServiceImpl) confirmPassword(ctx context.Context, email string) err
 	to := []string{"tes@gmail.com"}
 	
 	return sender.SendEmail(subject, content, to, nil, nil)
+}
+*/
+
+func(s *authServiceImpl) forgetPassword(email string) error {
+	sender := mail.NewGmailSender(
+		config.NewAppConfig().Email.Sender, 
+		config.NewAppConfig().Email.Adderss, 
+		config.NewAppConfig().Email.Password,
+	)
+
+	to := []string{email}
+	
+	return sender.SendEmail(to, nil, nil)
+}
+
+func (s *authServiceImpl) resetPassword(req *resetPassword) error {
+	err := s.port.resetPassword(req)
+	if err != nil {
+		return constans.NewInternalServerError("someathing when wrong")
+	}
+	return nil
 }
